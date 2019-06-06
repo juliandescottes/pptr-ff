@@ -16,12 +16,12 @@
 
 buildNode6IfNecessary();
 
-if (process.env.PUPPETEER_SKIP_CHROMIUM_DOWNLOAD) {
-  console.log('**INFO** Skipping Chromium download. "PUPPETEER_SKIP_CHROMIUM_DOWNLOAD" environment variable was found.');
+if (process.env.PUPPETEER_SKIP_FIREFOX_DOWNLOAD) {
+  console.log('**INFO** Skipping Firefox download. "PUPPETEER_SKIP_FIREFOX_DOWNLOAD" environment variable was found.');
   return;
 }
-if (process.env.NPM_CONFIG_PUPPETEER_SKIP_CHROMIUM_DOWNLOAD || process.env.npm_config_puppeteer_skip_chromium_download) {
-  console.log('**INFO** Skipping Chromium download. "PUPPETEER_SKIP_CHROMIUM_DOWNLOAD" was set in npm config.');
+if (process.env.NPM_CONFIG_PUPPETEER_SKIP_FIREFOX_DOWNLOAD || process.env.npm_config_puppeteer_skip_FIREFOX_download) {
+  console.log('**INFO** Skipping Firefox download. "PUPPETEER_SKIP_FIREFOX_DOWNLOAD" was set in npm config.');
   return;
 }
 
@@ -30,16 +30,15 @@ const downloadHost = process.env.PUPPETEER_DOWNLOAD_HOST || process.env.npm_conf
 const puppeteer = require('./index');
 const browserFetcher = puppeteer.createBrowserFetcher({ host: downloadHost });
 
-const revision = process.env.PUPPETEER_CHROMIUM_REVISION || process.env.npm_config_puppeteer_chromium_revision
-  || require('./package.json').puppeteer.chromium_revision;
+const downloadPath = process.env.PUPPETEER_FIREFOX_DL_PATH || process.env.npm_config_puppeteer_firefox_download_path
+  || require('./package.json').puppeteer.firefox_download_path;
 
+const revision = browserFetcher.getRevisionFromPath(downloadPath);
 const revisionInfo = browserFetcher.revisionInfo(revision);
 
 // Do nothing if the revision is already downloaded.
-if (revisionInfo.local) {
-  generateProtocolTypesIfNecessary(false /* updated */);
+if (revisionInfo.local)
   return;
-}
 
 // Override current environment proxy settings with npm configuration, if any.
 const NPM_HTTPS_PROXY = process.env.npm_config_https_proxy || process.env.npm_config_proxy;
@@ -53,7 +52,7 @@ if (NPM_HTTP_PROXY)
 if (NPM_NO_PROXY)
   process.env.NO_PROXY = NPM_NO_PROXY;
 
-browserFetcher.download(revisionInfo.revision, onProgress)
+browserFetcher.download(downloadPath, onProgress)
     .then(() => browserFetcher.localRevisions())
     .then(onSuccess)
     .catch(onError);
@@ -63,18 +62,18 @@ browserFetcher.download(revisionInfo.revision, onProgress)
  * @return {!Promise}
  */
 function onSuccess(localRevisions) {
-  console.log('Chromium downloaded to ' + revisionInfo.folderPath);
+  console.log('Firefox downloaded to ' + revisionInfo.folderPath);
   localRevisions = localRevisions.filter(revision => revision !== revisionInfo.revision);
-  // Remove previous chromium revisions.
+  // Remove previous Firefox revisions.
   const cleanupOldVersions = localRevisions.map(revision => browserFetcher.remove(revision));
-  return Promise.all([...cleanupOldVersions, generateProtocolTypesIfNecessary(true /* updated */)]);
+  return Promise.all([...cleanupOldVersions]);
 }
 
 /**
  * @param {!Error} error
  */
 function onError(error) {
-  console.error(`ERROR: Failed to download Chromium r${revision}! Set "PUPPETEER_SKIP_CHROMIUM_DOWNLOAD" env variable to skip download.`);
+  console.error(`ERROR: Failed to download Firefox ${revision}! Set "PUPPETEER_SKIP_FIREFOX_DOWNLOAD" env variable to skip download.`);
   console.error(error);
   process.exit(1);
 }
@@ -84,7 +83,7 @@ let lastDownloadedBytes = 0;
 function onProgress(downloadedBytes, totalBytes) {
   if (!progressBar) {
     const ProgressBar = require('progress');
-    progressBar = new ProgressBar(`Downloading Chromium r${revision} - ${toMegabytes(totalBytes)} [:bar] :percent :etas `, {
+    progressBar = new ProgressBar(`Downloading Firefox ${revision} - ${toMegabytes(totalBytes)} [:bar] :percent :etas `, {
       complete: '=',
       incomplete: ' ',
       width: 20,
