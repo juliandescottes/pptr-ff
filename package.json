@@ -1,7 +1,7 @@
 {
   "name": "jdescottes-pptr-ff",
   "license": "MPL-2.0",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Experimental Puppeteer using official Firefox Nightlies",
   "main": "index.js",
   "repository": "github:juliandescottes/pptr-ff",
