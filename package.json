@@ -1,7 +1,7 @@
 {
   "name": "jdescottes-pptr-ff",
   "license": "MPL-2.0",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Experimental Puppeteer using official Firefox Nightlies",
   "main": "index.js",
   "repository": "github:juliandescottes/pptr-ff",
@@ -10,7 +10,7 @@
     "node": ">=8.9.4"
   },
   "puppeteer": {
-    "firefox_download_path": "nightly/2019/06/2019-06-05-09-52-25-mozilla-central/firefox-69.0a1"
+    "firefox_download_path": "nightly/2019/06/2019-06-19-21-40-46-mozilla-central/firefox-69.0a1"
   },
   "scripts": {
     "install": "node install.js"
