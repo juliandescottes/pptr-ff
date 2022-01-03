@@ -592,6 +592,9 @@ describe('network', function () {
       expect(requests.get('script.js').isNavigationRequest()).toBe(false);
       expect(requests.get('style.css').isNavigationRequest()).toBe(false);
     });
+    // This `itFailsFirefox` should be preserved in mozilla-central (Firefox).
+    // See https://bugzilla.mozilla.org/show_bug.cgi?id=1748254
+    // or https://github.com/puppeteer/puppeteer/pull/7846
     itFailsFirefox('should work when navigating to image', async () => {
       const { page, server } = getTestState();
 
